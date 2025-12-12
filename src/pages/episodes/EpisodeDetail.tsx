@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '@/services/api';
-import { CharacterCard } from '@/components/CharacterCard';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 interface Episode {
@@ -106,7 +106,24 @@ export const EpisodeDetail: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {characters.map((character) => (
-                <CharacterCard key={character.id} character={character} />
+                 <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+                    <CardContent className="p-0">
+                      <img
+                        src={character.image}
+                        alt={character.name}
+                        className="w-full h-64 object-cover rounded-t-lg"
+                      />
+                    </CardContent>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg">{character.name}</CardTitle>
+                      <CardDescription>
+                        <div className="text-sm mt-2">
+                          <p><span className="font-semibold">Status:</span> {character.status}</p>
+                          <p><span className="font-semibold">Species:</span> {character.species}</p>
+                        </div>
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
               ))}
             </div>
           )}

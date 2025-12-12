@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '@/services/api';
-import { CharacterCard } from '@/components/CharacterCard';
-import { SearchBar } from '@/components/SearchBar';
-import { Pagination } from '@/components/Pagination';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 interface Character {
   id: number;
@@ -67,10 +66,7 @@ export const CharactersList: React.FC = () => {
       <div className="w-full px-4 py-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-8">Characters</h1>
 
-        <SearchBar
-          onSearch={handleSearch}
-          placeholder="Search characters by name..."
-        />
+
 
         {loading && (
           <div className="text-center py-12">
@@ -94,15 +90,46 @@ export const CharactersList: React.FC = () => {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {characters.map((character) => (
-                <CharacterCard key={character.id} character={character} />
+                <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+                  <CardContent className="p-0">
+                    <img
+                      src={character.image}
+                      alt={character.name}
+                      className="w-full h-64 object-cover rounded-t-lg"
+                    />
+                  </CardContent>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg">{character.name}</CardTitle>
+                    <CardDescription>
+                      <div className="text-sm mt-2">
+                        <p><span className="font-semibold">Status:</span> {character.status}</p>
+                        <p><span className="font-semibold">Species:</span> {character.species}</p>
+                      </div>
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
               ))}
             </div>
 
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
+            <div className="flex justify-center items-center gap-4 my-8">
+              <Button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                variant="outline"
+              >
+                Previous
+              </Button>
+              <span className="text-sm font-medium">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                variant="outline"
+              >
+                Next
+              </Button>
+            </div>
           </>
         )}
       </div>

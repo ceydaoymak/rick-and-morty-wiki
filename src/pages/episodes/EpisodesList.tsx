@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '@/services/api';
-import { EpisodeCard } from '@/components/EpisodeCard';
-import { Pagination } from '@/components/Pagination';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 interface Episode {
   id: number;
@@ -77,15 +77,39 @@ export const EpisodesList: React.FC = () => {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {episodes.map((episode) => (
-                <EpisodeCard key={episode.id} episode={episode} />
+                <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="text-lg">{episode.name}</CardTitle>
+                    <CardDescription>
+                      <div className="text-sm mt-2 space-y-1">
+                        <p><span className="font-semibold">Episode:</span> {episode.episode}</p>
+                        <p><span className="font-semibold">Air Date:</span> {episode.air_date}</p>
+                      </div>
+                    </CardDescription>
+                  </CardHeader>
+                </Card>             
               ))}
             </div>
 
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
+            <div className="flex justify-center items-center gap-4 my-8">
+              <Button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                variant="outline"
+              >
+                Previous
+              </Button>
+              <span className="text-sm font-medium">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                variant="outline"
+              >
+                Next
+              </Button>
+            </div>
           </>
         )}
       </div>
