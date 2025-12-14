@@ -24,3 +24,17 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Node
+node_modules/
+
+# Build output
+dist/
+
+# TypeScript
+*.tsbuildinfo
+
+# Vite
+vite.config.d.ts
+
+# Logs
+npm-debug.log*
