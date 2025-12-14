@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '@/services/api';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 
 interface Episode {
   id: number;
@@ -20,7 +18,7 @@ interface Character {
   image: string;
 }
 
-export const EpisodeDetail: React.FC = () => {
+export function EpisodeDetail() {
   const { id } = useParams<{ id: string }>();
   const [episode, setEpisode] = useState<Episode | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -71,7 +69,7 @@ export const EpisodeDetail: React.FC = () => {
         <div className="text-center">
           <p className="text-lg text-red-600 mb-4">{error || 'Episode not found'}</p>
           <Link to="/episodes">
-            <Button>Back to Episodes</Button>
+            <button>Back to Episodes</button>
           </Link>
         </div>
       </div>
@@ -82,7 +80,7 @@ export const EpisodeDetail: React.FC = () => {
     <div className="w-full bg-gray-50 ">
       <div className="w-full px-4 py-8">
         <Link to="/episodes" className="mb-6 inline-block">
-          <Button variant="outline">Back to Episodes</Button>
+          <button>Back to Episodes</button>
         </Link>
 
         <div className="bg-white rounded-lg shadow-md p-8 mb-8">
@@ -106,24 +104,22 @@ export const EpisodeDetail: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {characters.map((character) => (
-                 <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-                    <CardContent className="p-0">
+                 <div className="cursor-pointer hover:shadow-lg transition-shadow">
+                    <div className="p-0">
                       <img
                         src={character.image}
                         alt={character.name}
                         className="w-full h-64 object-cover rounded-t-lg"
                       />
-                    </CardContent>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-lg">{character.name}</CardTitle>
-                      <CardDescription>
-                        <div className="text-sm mt-2">
+                    </div>
+                    <div className="pb-3">
+                      <h3 className="text-lg">{character.name}</h3>
+                      <div className="text-sm mt-2">
                           <p><span className="font-semibold">Status:</span> {character.status}</p>
                           <p><span className="font-semibold">Species:</span> {character.species}</p>
                         </div>
-                      </CardDescription>
-                    </CardHeader>
-                  </Card>
+                    </div>
+                  </div>
               ))}
             </div>
           )}

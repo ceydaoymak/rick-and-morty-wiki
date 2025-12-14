@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '@/services/api';
-import { Button } from '@/components/ui/button';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface Character {
   id: number;
@@ -23,7 +21,7 @@ interface Episode {
   air_date: string;
 }
 
-export const CharacterDetail: React.FC = () => {
+export function CharacterDetail(){
   const { id } = useParams<{ id: string }>();
   const [character, setCharacter] = useState<Character | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
@@ -31,33 +29,26 @@ export const CharacterDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCharacterAndEpisodes = async () => {
+    if (!id) return;
+
+    (async () => {
       setLoading(true);
       setError(null);
       try {
-        const characterResponse = await api.get<Character>(`/character/${id}`);
-        setCharacter(characterResponse.data);
+        const { data: character } = await api.get<Character>(`/character/${id}`);
+        setCharacter(character);
 
-        if (characterResponse.data.episode.length > 0) {
-          const episodeIds = characterResponse.data.episode
-            .map((url: string) => url.split('/').pop())
-            .join(',');
-          const episodesResponse = await api.get<Episode | Episode[]>(`/episode/${episodeIds}`);
-          const episodesArray = Array.isArray(episodesResponse.data)
-            ? episodesResponse.data
-            : [episodesResponse.data];
-          setEpisodes(episodesArray);
-        }
-      } catch (err) {
-        setError('Failed to fetch character details');
+        const episodeIds = character.episode?.map(u => u.split("/").pop()).join(",");
+        if (!episodeIds) return setEpisodes([]);
+
+        const { data } = await api.get<Episode | Episode[]>(`/episode/${episodeIds}`);
+        setEpisodes(Array.isArray(data) ? data : [data]);
+      } catch {
+        setError("Failed to fetch character details");
       } finally {
         setLoading(false);
       }
-    };
-
-    if (id) {
-      fetchCharacterAndEpisodes();
-    }
+    })();
   }, [id]);
 
   if (loading) {
@@ -74,7 +65,7 @@ export const CharacterDetail: React.FC = () => {
         <div className="text-center">
           <p className="text-lg text-red-600 mb-4">{error || 'Character not found'}</p>
           <Link to="/characters">
-            <Button>Back to Characters</Button>
+            <button>Back to Characters</button>
           </Link>
         </div>
       </div>
@@ -85,7 +76,7 @@ export const CharacterDetail: React.FC = () => {
     <div className="w-full bg-gray-50 ">
       <div className="w-full px-4 py-8">
         <Link to="/characters" className="mb-6 inline-block">
-          <Button variant="outline">Back to Characters</Button>
+          <button>Back to Characters</button>
         </Link>
 
         <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
@@ -132,17 +123,16 @@ export const CharacterDetail: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {episodes.map((episode) => (
-<Card className="cursor-pointer hover:shadow-lg transition-shadow">
-        <CardHeader>
-          <CardTitle className="text-lg">{episode.name}</CardTitle>
-          <CardDescription>
-            <div className="text-sm mt-2 space-y-1">
-              <p><span className="font-semibold">Episode:</span> {episode.episode}</p>
-              <p><span className="font-semibold">Air Date:</span> {episode.air_date}</p>
-            </div>
-          </CardDescription>
-        </CardHeader>
-      </Card>              ))}
+                <div className="cursor-pointer hover:shadow-lg transition-shadow">
+                  <div>
+                    <h3 className="text-lg">{episode.name}</h3>
+                    <div className="text-sm mt-2 space-y-1">
+                      <p><span className="font-semibold">Episode:</span> {episode.episode}</p>
+                        <p><span className="font-semibold">Air Date:</span> {episode.air_date}</p>
+                      </div>
+                  </div>  
+                </div>            
+              ))}
             </div>
           )}
         </div>

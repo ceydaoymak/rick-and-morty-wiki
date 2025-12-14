@@ -1,9 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
 import { Home } from '@/pages/Home';
-import { CharactersList, CharacterDetail } from '@/pages/characters';
-import { EpisodesList, EpisodeDetail } from '@/pages/episodes';
-import { LocationsList, LocationDetail } from '@/pages/locations';
+import { CharacterDetail } from '@/pages/characters/CharacterDetail';
+import { CharactersList } from '@/pages/characters/CharactersList';
+import { EpisodeDetail } from '@/pages/episodes/EpisodeDetail';
+import {EpisodesList} from '@/pages/episodes/EpisodesList';
+import { LocationsList } from '@/pages/locations/LocationsList';
+import { LocationDetail } from '@/pages/locations/LocationDetail';
 
 export default function App() {
   return (

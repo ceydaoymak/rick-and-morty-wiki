@@ -1,6 +1,4 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 
 export function Navbar() {
   return (
@@ -11,16 +9,16 @@ export function Navbar() {
         </Link>
         <div className="flex gap-4">
           <Link to="/">
-            <Button variant="ghost">Home</Button>
+            <button>Home</button>
           </Link>
           <Link to="/characters">
-            <Button variant="ghost">Characters</Button>
+            <button>Characters</button>
           </Link>
           <Link to="/episodes">
-            <Button variant="ghost">Episodes</Button>
+            <button>Episodes</button>
           </Link>
           <Link to="/locations">
-            <Button variant="ghost">Locations</Button>
+            <button>Locations</button>
           </Link>
         </div>
       </div>

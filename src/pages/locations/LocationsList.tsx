@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '@/services/api';
-import { Card, CardDescription, CardHeader, CardTitle,  } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import Card from '@/components/Card';
 
 interface Location {
   id: number;
@@ -10,17 +10,7 @@ interface Location {
   dimension: string;
 }
 
-interface ApiResponse {
-  info: {
-    count: number;
-    pages: number;
-    next: string | null;
-    prev: string | null;
-  };
-  results: Location[];
-}
-
-export const LocationsList: React.FC = () => {
+export function LocationsList () {
   const [locations, setLocations] = useState<Location[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -32,7 +22,7 @@ export const LocationsList: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await api.get<ApiResponse>(`/location?page=${currentPage}`);
+        const response = await api.get(`/location?page=${currentPage}`);
         setLocations(response.data.results);
         setTotalPages(response.data.info.pages);
       } catch (err) {
@@ -67,51 +57,42 @@ export const LocationsList: React.FC = () => {
           </div>
         )}
 
-        {!loading && !error && locations.length === 0 && (
+        {locations.length === 0 && (
           <div className="text-center py-12">
             <p className="text-lg text-gray-600">No locations found</p>
           </div>
         )}
 
-        {!loading && !error && locations.length > 0 && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {locations.map((location) => (
-                <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="text-lg">{location.name}</CardTitle>
-                    <CardDescription>
-                      <div className="text-sm mt-2 space-y-1">
-                        <p><span className="font-semibold">Type:</span> {location.type}</p>
-                        <p><span className="font-semibold">Dimension:</span> {location.dimension}</p>
-                      </div>
-                    </CardDescription>
-                  </CardHeader>
-                </Card>              
-              ))}
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {locations.map((location) => (
+            <Link to={`/locations/${location.id}`} key={location.id}>
+              <div className="cursor-pointer hover:shadow-lg transition-shadow">
+                <Card
+                  title={location.name}
+                  description={`Type: ${location.type} • Dimension: ${location.dimension}`}
+                />
+              </div>
+            </Link>
+          ))}
+        </div>
 
-            <div className="flex justify-center items-center gap-4 my-8">
-              <Button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                variant="outline"
-              >
-                Previous
-              </Button>
-              <span className="text-sm font-medium">
-                Page {currentPage} of {totalPages}
-              </span>
-              <Button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                variant="outline"
-              >
-                Next
-              </Button>
-            </div>
-          </>
-        )}
+        <div className="flex justify-center items-center gap-4 my-8">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span className="text-sm font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
