@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import api from '@/services/api';
 import { Link } from 'react-router-dom';
 import Card from '@/components/Card';
+import { Pagination } from '@/components/Pagination';
+import { SearchBar } from '@/components/SearchBar';
 
 interface Location {
   id: number;
@@ -16,25 +18,36 @@ export function LocationsList () {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     const fetchLocations = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await api.get(`/location?page=${currentPage}`);
+        let url = `/location?page=${currentPage}`;
+        if (search) {
+          url = `/location?name=${encodeURIComponent(search)}&page=${currentPage}`;
+        }
+        const response = await api.get(url);
         setLocations(response.data.results);
         setTotalPages(response.data.info.pages);
-      } catch (err) {
-        setError('Failed to fetch locations');
-        setLocations([]);
+      } catch (err: any) {
+        if (err.response?.status === 404 && search) {
+          setLocations([]);
+          setTotalPages(1);
+          setError(null);
+        } else {
+          setError('Failed to fetch locations');
+          setLocations([]);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchLocations();
-  }, [currentPage]);
+  }, [currentPage,search]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -44,6 +57,16 @@ export function LocationsList () {
     <div className="mt-12 w-full bg-gray-50 ">
       <div className="w-full px-4 py-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-8">Locations</h1>
+        <div className="mb-6 flex items-center gap-2">
+          <SearchBar
+            value={search}
+            onChange={(value) => {
+              setSearch(value);
+              setCurrentPage(1);
+            }}
+            placeholder="Search by name..."
+          />
+        </div>
 
         {loading && (
           <div className="text-center py-12">
@@ -76,23 +99,11 @@ export function LocationsList () {
           ))}
         </div>
 
-        <div className="flex justify-center items-center gap-4 my-8">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span className="text-sm font-medium">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );

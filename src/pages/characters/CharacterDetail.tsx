@@ -13,20 +13,18 @@ interface Character {
   image: string;
   episode: string[];
 }
-
 interface Episode {
   id: number;
   name: string;
   episode: string;
-  air_date: string;
 }
 
 export function CharacterDetail(){
   const { id } = useParams<{ id: string }>();
   const [character, setCharacter] = useState<Character | null>(null);
-  const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [episodes, setEpisodes] = useState<Episode[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -35,15 +33,18 @@ export function CharacterDetail(){
       setLoading(true);
       setError(null);
       try {
-        const { data: character } = await api.get<Character>(`/character/${id}`);
-        setCharacter(character);
+          const { data: character } = await api.get<Character>(`/character/${id}`);
+          setCharacter(character);
 
-        const episodeIds = character.episode?.map(u => u.split("/").pop()).join(",");
-        if (!episodeIds) return setEpisodes([]);
+          if (character.episode.length > 0) {
+            const episodeIds = character.episode
+              .map(url => url.split('/').pop())
+              .join(',');
 
-        const { data } = await api.get<Episode | Episode[]>(`/episode/${episodeIds}`);
-        setEpisodes(Array.isArray(data) ? data : [data]);
-      } catch {
+            const { data } = await api.get<Episode | Episode[]>(`/episode/${episodeIds}`);
+            setEpisodes(Array.isArray(data) ? data : [data]);
+          }
+    } catch {
         setError("Failed to fetch character details");
       } finally {
         setLoading(false);
@@ -73,7 +74,7 @@ export function CharacterDetail(){
   }
 
   return (
-    <div className="w-full bg-gray-50 ">
+    <div className="w-full">
       <div className="w-full px-4 py-8">
         <Link to="/characters" className="mb-6 inline-block">
           <button>Back to Characters</button>
@@ -115,27 +116,36 @@ export function CharacterDetail(){
             </div>
           </div>
         </div>
+        <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8 p-6">
+              <p className="text-sm font-semibold text-gray-600 mb-3">Episodes</p>
 
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Episodes</h2>
-          {episodes.length === 0 ? (
-            <p className="text-gray-600">No episodes found for this character</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {episodes.map((episode) => (
-                <div className="cursor-pointer hover:shadow-lg transition-shadow">
-                  <div>
-                    <h3 className="text-lg">{episode.name}</h3>
-                    <div className="text-sm mt-2 space-y-1">
-                      <p><span className="font-semibold">Episode:</span> {episode.episode}</p>
-                        <p><span className="font-semibold">Air Date:</span> {episode.air_date}</p>
-                      </div>
-                  </div>  
-                </div>            
-              ))}
+              {episodes.length === 0 ? (
+                <p className="text-gray-500 text-sm">No episodes available</p>
+              ) : (
+                <ul
+                  className="
+                    grid
+                    grid-cols-1
+                    sm:grid-cols-2
+                    lg:grid-cols-3
+                    gap-x-6
+                    gap-y-2
+                    text-sm
+                  "
+                >
+                  {episodes.map((ep) => (
+                    <li key={ep.id}>
+                      <Link
+                        to={`/episodes/${ep.id}`}
+                        className="text-indigo-600 hover:underline"
+                      >
+                        {ep.episode} – {ep.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
-          )}
-        </div>
       </div>
     </div>
   );

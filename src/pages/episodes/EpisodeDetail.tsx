@@ -9,39 +9,37 @@ interface Episode {
   air_date: string;
   characters: string[];
 }
-
 interface Character {
   id: number;
   name: string;
-  status: string;
-  species: string;
   image: string;
 }
 
 export function EpisodeDetail() {
   const { id } = useParams<{ id: string }>();
   const [episode, setEpisode] = useState<Episode | null>(null);
-  const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [characters, setCharacters] = useState<Character[]>([]);
 
   useEffect(() => {
     const fetchEpisodeAndCharacters = async () => {
       setLoading(true);
       setError(null);
       try {
-        const episodeResponse = await api.get<Episode>(`/episode/${id}`);
-        setEpisode(episodeResponse.data);
+        const { data: episode } = await api.get<Episode>(`/episode/${id}`);
+        setEpisode(episode);
 
-        if (episodeResponse.data.characters.length > 0) {
-          const characterIds = episodeResponse.data.characters
-            .map((url: string) => url.split('/').pop())
+        if (episode.characters.length > 0) {
+          const characterIds = episode.characters
+            .map(url => url.split('/').pop())
             .join(',');
-          const charactersResponse = await api.get<Character | Character[]>(`/character/${characterIds}`);
-          const charactersArray = Array.isArray(charactersResponse.data)
-            ? charactersResponse.data
-            : [charactersResponse.data];
-          setCharacters(charactersArray);
+
+          const { data } = await api.get<Character | Character[]>(
+            `/character/${characterIds}`
+          );
+
+          setCharacters(Array.isArray(data) ? data : [data]);
         }
       } catch (err) {
         setError('Failed to fetch episode details');
@@ -96,32 +94,34 @@ export function EpisodeDetail() {
             </div>
           </div>
         </div>
+        <div className='bg-white rounded-lg shadow-md p-8 mb-8'>
+          <p className="text-sm font-semibold text-gray-600 mb-3">Characters</p>
 
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Characters</h2>
           {characters.length === 0 ? (
-            <p className="text-gray-600">No characters found for this episode</p>
+            <p className="text-gray-500 text-sm">No characters available</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {characters.map((character) => (
-                 <div className="cursor-pointer hover:shadow-lg transition-shadow">
-                    <div className="p-0">
-                      <img
-                        src={character.image}
-                        alt={character.name}
-                        className="w-full h-64 object-cover rounded-t-lg"
-                      />
-                    </div>
-                    <div className="pb-3">
-                      <h3 className="text-lg">{character.name}</h3>
-                      <div className="text-sm mt-2">
-                          <p><span className="font-semibold">Status:</span> {character.status}</p>
-                          <p><span className="font-semibold">Species:</span> {character.species}</p>
-                        </div>
-                    </div>
-                  </div>
+            <ul
+              className="
+                grid
+                grid-cols-1
+                sm:grid-cols-2
+                lg:grid-cols-3
+                gap-x-6
+                gap-y-2
+                text-sm
+              "
+            >
+              {characters.map((c) => (
+                <li key={c.id}>
+                  <Link
+                    to={`/characters/${c.id}`}
+                    className="text-indigo-600 hover:underline"
+                  >
+                    {c.name}
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
           )}
         </div>
       </div>

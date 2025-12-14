@@ -6,7 +6,7 @@ interface CardProps {
 
 function Card({ image, title, description }: CardProps) {
   return (
-    <div className={`bg-white rounded-lg overflow-hidden shadow-sm`}>
+    <div className={`bg-white p-4 rounded-lg overflow-hidden shadow-sm`}>
       {image && (
         <div className="w-full">
           <img src={image} alt={title ?? 'card-image'} className="w-full h-64 object-cover" />
