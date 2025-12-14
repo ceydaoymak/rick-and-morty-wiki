@@ -88,8 +88,7 @@ export function CharactersList(){
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {characters.map((character) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">          {characters.map((character) => (
             <Link to={`/characters/${character.id}`} key={character.id} className='cursor-point'>
               <div className="cursor-pointer hover:shadow-lg transition-shadow">
                 <Card
